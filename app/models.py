@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models import UniqueConstraint
+from app.validators import custom_validate_file
 
 # Create your models here.
 
@@ -9,13 +11,15 @@ class Usuario(AbstractUser):     #CLASE QUE HEREDA DE AbstractUser LA QUE PERMIT
     Hereda todas las funcionalidades básicas de usuario de Django y añade
     campos específicos para el ente fiscalizador.
     """
+
+    #lista de tuplas: ('valor_en_database', 'nombre_legible')
     TIPOS_ENTE = [
-        'servicio_evaluacion_ambiental,',
-        'superintendencia_electricidad_combustibles',
-        'intendencia_regional_valparaiso',
-        'dg_territorio_maritimo_y_marina_mercante',    #dg = direccion general
-        'corporacion_nacional_forestal',
-        'servicio_agricola_ganadero'
+        ('servicio_evaluacion_ambiental', 'Servicio de Evaluación Ambiental'),
+        ('superintendencia_electricidad_combustibles', 'Superintendencia de Electricidad y Combustibles'),
+        ('intendencia_regional_valparaiso', 'Intendencia Regional de Valparaíso'),
+        ('dg_territorio_maritimo_y_marina_mercante', 'Dirección General de Territorio Marítimo y Marina Mercante'),
+        ('corporacion_nacional_forestal', 'Corporación Nacional Forestal'),
+        ('servicio_agricola_ganadero', 'Servicio Agrícola y Ganadero'),
     ]
 
     tipo_ente = models.CharField(
@@ -101,7 +105,7 @@ class TipoDocumentoPermitido(models.Model):     #define que documento puede subi
         verbose_name='Tipo de ente fiscalizador'
     )
 
-    nombre = models.CharField(max_length=100),
+    nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
     extension_permitida = models.CharField(max_length=10)
 
@@ -111,7 +115,10 @@ class TipoDocumentoPermitido(models.Model):     #define que documento puede subi
     )
     
     class Meta:
-        unique_together = ['tipo_ente', 'nombre']     ##########
+        constraints = [
+            UniqueConstraint(fields=['tipo_ente', 'nombre'], name='unique_tipo_ente_nombre')     #UniqueConstraint impone restricciones de unicidad
+            #en uno o mas campos de la base de datos evitando que se repitan
+        ]     
 
     #Para que esta clase funcione correctamente, primero debemos registrar en la base de datos los tipos de documentos permitidos. Ejemplo:
 
