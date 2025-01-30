@@ -14,8 +14,8 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     #antes de llegar a este metodo, se crea un diccionario "data" que representa un objeto creado previamente con los campos del modelo "TipoDocumentoPermitido"
     
-    def validate(self, data):     #data corresponde a un diccionario que contiene todos los datos que llegan en la peticion despues de una validacion inicial previo a  validate()
-        usuario = self.context['request'].user     #asigno la instancia actual del usuario
+    def validate(self, data):     #data corresponde a un diccionario que contiene todos los datos que llegan en la peticion despues de una validacion inicial previo a esta funcion validate()
+        usuario = self.context['request'].user     #asigno la instancia actual del usuario. este tendrá sus atributos definidos
         tipo_doc = data['tipo_documento']     #data['tipo_documento'] va a contener todos los atributos y metodos, ya que mediante ForeignKey el campo tipo_documento de la clase Documento contiene TODOS los atributos de la clase TipoDocumentoPermitido. Se lee de la siguiente forma: <TipoDocumentoPermitido: id=1, tipo_ente= ... >
 
         if tipo_doc.tipo_ente != usuario.tipo_ente:     #si el tipo_ente presente en tipo_doc es diferente al tipo_ente de usuario:

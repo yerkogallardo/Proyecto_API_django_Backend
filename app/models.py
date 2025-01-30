@@ -120,6 +120,9 @@ class TipoDocumentoPermitido(models.Model):     #define que documento puede subi
             #en uno o mas campos de la base de datos evitando que se repitan
         ]     
 
+    def __str__(self):
+        return f"{self.nombre} (Subido por {self.get_tipo_ente_display()})"
+
     #Para que esta clase funcione correctamente, primero debemos registrar en la base de datos los tipos de documentos permitidos. Ejemplo:
 
     # tipo_doc = TipoDocumentoPermitido.objects.create(
