@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import UniqueConstraint
-from app.validators import custom_validate_file
+from app.api.validators import custom_validate_file
 
 # Create your models here.
 
