@@ -10,17 +10,6 @@ class DocumentoSerializer(serializers.ModelSerializer):
         # read_only_fields = ['estado']      #campo solo lectura
         fields = '__all__'
 
-
-
-    # def validate_tipo_documento(self, value):
-    #     tipos_validos = [tipo[0] for tipo in TipoDocumentoPermitido.TIPOS_DOCUMENTOS]
-    #     if value.nombre not in tipos_validos:
-    #         raise serializers.ValidationError("Tipo de documento no permitido.")
-    #     return value
-    #El parámetro value en la función validate_tipo_documento representa el valor del campo tipo_documento que se está validando cuando se envía una solicitud a la API.
-
-
-
     #verificamos que el tipo de documento corresponda al ente fiscalizador
 
     #antes de llegar a este metodo, se crea un diccionario "data" que representa un objeto creado previamente con los campos del modelo "TipoDocumentoPermitido"
@@ -35,15 +24,6 @@ class DocumentoSerializer(serializers.ModelSerializer):
                 {"tipo_documento": "Este tipo de documento no está permitido para su usuario."}
             )
         return data
-
-
-
-        # if usuario.tipo_ente != tipo_doc.tipo_ente:     #si el tipo_ente presente en tipo_doc es diferente al tipo_ente de usuario:
-        #     raise serializers.ValidationError(
-        #         "Este tipo de documento no está permitido para su tipo de ente fiscalizador"
-        #     )
-        # return data     #si todo va bien, finaliza la validacion y devuelve datos validados. Luego se dirige a método create(self, calidated_data)
-    
 
 
 
