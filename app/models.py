@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import UniqueConstraint
 from app.api.validators import custom_validate_file
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -70,7 +71,8 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
     
     tipo_documento = models.ForeignKey(     
         'TipoDocumentoPermitido',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        # limit_choices_to=models.Q(tipo_ente=models.F('usuario__tipo_ente'))     #limit choices to filtra los tipo_documento que aparecen en el admin de Django para que solo muestre aquellos que coincidan con el tipo_ente del usuario
     )
 
     archivo = models.FileField(     #que archivo es
@@ -90,22 +92,38 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
         default='PENDIENTE'
     )
 
+    def clean(self):     #metodo para validar datos de un formulario
+        """ Valida que el usuario tenga permiso para subir este tipo de documento, osea que esté en la lista de entes_permitidos del documento """
+        if not self.tipo_documento.entes_permitidos.filter(id=self.usuario.id).exists():
+            raise ValidationError({'tipo_documento': "Este tipo de documento no está permitido para su usuario."})
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Llamar a la validación antes de guardar
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.usuario.codigo_ente} - {self.tipo_documento.nombre}"
     
 
 
-class TipoDocumentoPermitido(models.Model):     #define que documento puede subir cada ente fiscalizador. 
+class TipoDocumentoPermitido(models.Model):     #define la configuracion del documento que puede subir cada ente fiscalizador. No confundir con extensión de documento
     """
     Se define qué tipos de documentos pueden subir cada ente fiscalizador.
     """
-    tipo_ente = models.CharField(
-        max_length=50,
-        choices=Usuario.TIPOS_ENTE,
-        verbose_name='Tipo de ente fiscalizador'
-    )
 
-    nombre = models.CharField(max_length=100)
+    TIPOS_DOCUMENTOS = [
+        ('CIF', 'Catastro de incendios forestales'),
+        ('IPC', 'Informe plan de comunicacion')
+    ]    #AGREGAR MAS TIPOS DE DOCUMENTOS
+    
+
+    # tipo_ente = models.CharField(     #ente que lo puede subir
+    #     max_length=50,
+    #     choices=Usuario.TIPOS_ENTE,
+    #     verbose_name='Tipo de ente fiscalizador'
+    # )
+
+    nombre = models.CharField(max_length=100)     #documento específico que puede subir cada organismo. Ejemplo: "Catastro de incendios forestales"
     descripcion = models.TextField(blank=True)
     extension_permitida = models.CharField(max_length=10)
 
@@ -113,15 +131,22 @@ class TipoDocumentoPermitido(models.Model):     #define que documento puede subi
         default=False,
         help_text="Indica si este documento es de entrega obligatoria"
     )
+
+    #cada tipo de documento puede asociarse a multiples usuarios
+    entes_permitidos = models.ManyToManyField(Usuario, related_name='documentos_permitidos')     #permite asociar varios usuarios a un mismo documento 
     
+
     class Meta:
         constraints = [
-            UniqueConstraint(fields=['tipo_ente', 'nombre'], name='unique_tipo_ente_nombre')     #UniqueConstraint impone restricciones de unicidad
-            #en uno o mas campos de la base de datos evitando que se repitan
+            UniqueConstraint(fields=['nombre'], name='unique_tipo_documento')     #UniqueConstraint impone restricciones de unicidad
+            #en uno o mas campos de la base de datos evitando que se repitan En este caso, no peuden haber 2 tipos de documentos con el mismo nombre. 
+            #Campo "nombre" debe ser unico en la tabla
         ]     
 
     def __str__(self):
-        return f"{self.nombre} (Subido por {self.get_tipo_ente_display()})"
+        # Muestra los nombres de los entes permitidos en una lista
+        entes = ", ".join([ente.username for ente in self.entes_permitidos.all()])
+        return f"{self.nombre} - Permitido para: {entes}" if entes else f"{self.nombre}"
 
     #Para que esta clase funcione correctamente, primero debemos registrar en la base de datos los tipos de documentos permitidos. Ejemplo:
 
@@ -132,87 +157,4 @@ class TipoDocumentoPermitido(models.Model):     #define que documento puede subi
             #     extension_permitida='.pdf',
             #     obligatorio=True
     # )   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class Plan(models.Model):     #UN PLAN CONSIDERA UNA SERIE DE MEDIDAS
-
-#     estado = [
-#             ('ACTIVO', 'activo'),
-#             ('PAUSADO', 'pausado'),
-#             ('ATRASADO', 'atrasado'),
-#             ('FINALIZADO', 'finalizado'),
-#             ]
-#     id_plan = models.AutoField(primary_key=True)
-#     nombre_plan = models.CharField(max_length=255)
-#     estado_avance = models.CharField(max_length=20, choices=estado, default='ACTIVO')
-#     fecha_creación = models.DateTimeField(auto_now_add=True)
-#     ultima_atcualizacion = models.DateField(auto_now=True)
-
-#     def __str__(self):
-#         return f'Nombre plan: {self.nombre_plan}. Estado actual: {self.estado_avance}'
-
-
-
-# class MedidasDeAvance(models.Model):
-#     tipo_medida = [
-#                    ('AMBIENTAL', 'ambiental'),
-#                    ('SECTORIAL', 'sectorial')
-#                    ]
-#     id_avance = models.AutoField(primary_key=True)
-#     nombre_medida = models.CharField(max_length=75)
-#     detalles = models.TextField(max_length=2000)
-#     fecha_creación = models.DateTimeField(auto_now_add=True)
-#     ultima_atcualizacion = models.DateField(auto_now=True)
-#     id_plan = models.ForeignKey(Plan, on_delete=models.PROTECT)
-
-
-
-# class Superintendencia(User):
-#     id_tipo = models.AutoField(primary_key=True)
-#     tipo_usuario = models.CharField(max_length=75, default='Superintendencia')
-
-
-
-# class OrganismoSectorial(User):
-    
-#     lista_organismos = [
-#         'servicio_evaluacion_ambiental,',
-#         'superintendencia_electricidad_combustibles',
-#         'intendencia_regional_valparaiso',
-#         'dg_territorio_maritimo_y_marina_mercante',    #dg = direccion general
-#         'corporacion_nacional_forestal',
-#         'servicio_agricola_ganadero'
-#     ]
-
-#     localidades = [
-#         'Quintero', 'Concon', 'Puchuncavi'
-#     ]
-
-#     id_tipo = models.AutoField(primary_key=True)
-#     organismo = models.CharField(max_length=255, choices=lista_organismos)
-#     empresa_fiscalizada = models.CharField(max_length=75)
-#     localidad = models.CharField(max_length=75, choices=localidades)
-#     observaciones = models.TextField(max_length=500)
-#     rca_aprobadas = models.FileField()    #CAMPO PARA AGREGAR ARCHIVOS
-#     fecha_creación = models.DateTimeField(auto_now_add=True)
-#     ultima_atcualizacion = models.DateField(auto_now=True)
-
-
-#     def documentos_por_organismo(self):    #LOGICA PARA FILTRAR LOS DOCUMENTOS A SUBIR POR TIPO ORGANISMO
-        
-
-
-
 

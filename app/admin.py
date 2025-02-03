@@ -13,8 +13,13 @@ class DocumentoAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'tipo_documento', 'archivo', 'fecha_subida', 'estado')
 
 
-class TipoDocumentoPermitidoAdmin(admin.ModelAdmin):
-    list_display = ('tipo_ente', 'nombre', 'extension_permitida')
+class TipoDocumentoPermitidoAdmin(admin.ModelAdmin):     #OJO AQUI
+    list_display = ('get_entes_permitidos', 'nombre', 'extension_permitida')
+
+    def get_entes_permitidos(self, obj):
+        return ", ".join([ente.username for ente in obj.entes_permitidos.all()])
+    
+    get_entes_permitidos.short_description = "Entes Permitidos"  # Nombre de la columna en el admin
 
 
 admin.site.register(Usuario, UsuarioAdmin)
