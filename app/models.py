@@ -72,7 +72,6 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
     tipo_documento = models.ForeignKey(     
         'TipoDocumentoPermitido',
         on_delete=models.CASCADE,
-        # limit_choices_to=models.Q(tipo_ente=models.F('usuario__tipo_ente'))     #limit choices to filtra los tipo_documento que aparecen en el admin de Django para que solo muestre aquellos que coincidan con el tipo_ente del usuario
     )
 
     archivo = models.FileField(     #que archivo es
@@ -85,7 +84,7 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
     estado=models.CharField(
         max_length=20,
         choices=[
-            ('PENDIENTE', 'Pendiente de revisión'),     ##########
+            ('PENDIENTE', 'Pendiente de revisión'),     #
             ('APROBADO', 'aprobado'),
             ('RECHAZADO', 'rechazado')
         ],
@@ -116,13 +115,6 @@ class TipoDocumentoPermitido(models.Model):     #define la configuracion del doc
         ('IPC', 'Informe plan de comunicacion')
     ]    #AGREGAR MAS TIPOS DE DOCUMENTOS
     
-
-    # tipo_ente = models.CharField(     #ente que lo puede subir
-    #     max_length=50,
-    #     choices=Usuario.TIPOS_ENTE,
-    #     verbose_name='Tipo de ente fiscalizador'
-    # )
-
     nombre = models.CharField(max_length=100)     #documento específico que puede subir cada organismo. Ejemplo: "Catastro de incendios forestales"
     descripcion = models.TextField(blank=True)
     extension_permitida = models.CharField(max_length=10)
