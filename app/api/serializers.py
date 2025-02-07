@@ -3,6 +3,12 @@ from app.models import Documento, TipoDocumentoPermitido
 
 #Aquí validaremos la información entrante para garantizar seguridad e integridad
 
+class TipoDocumentoPermitidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoDocumentoPermitido
+        fields = '__all__'
+
+
 class DocumentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Documento

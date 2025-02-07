@@ -1,10 +1,18 @@
 from django.shortcuts import render
 
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
-from app.api.serializers import DocumentoSerializer
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, IsAdminUser
+from app.api.serializers import DocumentoSerializer, TipoDocumentoPermitidoSerializer
 from app.models import Usuario, Documento, TipoDocumentoPermitido
 # Create your views here.
+
+
+class TipoDocumentoPermitidoViewSet(viewsets.ModelViewSet):
+    serializer_class = TipoDocumentoPermitidoSerializer
+    queryset = TipoDocumentoPermitido.objects.all()
+    permission_classes = [IsAdminUser]
+
+
 
 class DocumentoViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentoSerializer
