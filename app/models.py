@@ -16,7 +16,6 @@ class OrganismoSectorial(models.Model):
 
     tipo_ente = models.CharField(
         max_length=100,
-        #choices = TIPOS_ENTE,
         verbose_name = 'Tipo de ente fiscalizador'
     )
 
@@ -33,7 +32,8 @@ class OrganismoSectorial(models.Model):
     )
 
     def __str__(self):
-        return f"{self.tipo_ente} - {self.codigo_ente}"     #Metodo especial creado por django automaticamente al definir un campo con "choices". Permite acceder al dato "amigable"
+        return f"{self.tipo_ente} - {self.codigo_ente}"     
+    
 
     # def clean(self):
     #     if self.tipo_ente in ['servicio_evaluacion_ambiental', 'intendencia_regional_valparaiso'] and not self.region:
@@ -89,7 +89,7 @@ def documento_upload_path(instance, filename):
 
 class Documento(models.Model):     #clase que representa cada archivo que se sube al sistema
     """
-    Modelo para manejar los documentos subidos por los entes fiscalizadores.
+    Modelo para manejar los documentos subidos por los usuarios asociados a un organismo sectorial.
     Cada documento está asociado directamente con el usuario que lo subió.
     """
     usuario = models.ForeignKey(     #usuario que sube el archivo
@@ -103,10 +103,12 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
         on_delete=models.CASCADE,
         )
 
-    archivo = models.FileField(     #que archivo es
+    archivo = models.FileField(     
         upload_to=documento_upload_path,
-        # validators=['custom_validate_file']     #Funcion validadora a crear. Corchetes ya que validators espera una lista de funciones validadoras (pueden ser varias)
+        # validators=['custom_validate_file']     
         )
+    '''custom_validate_file = Funcion validadora. Corchetes ya que validators 
+    espera una lista de funciones validadoras (pueden ser varias y personalizables)'''
 
     fecha_subida=models.DateTimeField(auto_now_add=True)
 
@@ -142,12 +144,13 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
     
 
 
-class TipoDocumentoPermitido(models.Model):     #define la configuracion del documento que puede subir cada usuario. No confundir con extensión de documento
+class TipoDocumentoPermitido(models.Model):     
     """
-    Se define qué tipos de documentos pueden subir cada usuario.
+    Se define qué tipos de documentos pueden subir cada usuario. Pueden tener formatos compartidos o propios.
+    No confundir con "extensión" del documento. Ejemplo: "Catastro de incendios forestales" solo lo sube conaf
     """
 
-    nombre = models.CharField(max_length=100)     #documento específico que puede subir cada organismo. Ejemplo: "Catastro de incendios forestales"
+    nombre = models.CharField(max_length=100)    
     descripcion = models.TextField(blank=True)
     extension_permitida = models.CharField(max_length=10)
 
@@ -165,10 +168,11 @@ class TipoDocumentoPermitido(models.Model):     #define la configuracion del doc
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=['nombre'], name='unique_tipo_documento')     #UniqueConstraint impone restricciones de unicidad
-            #en uno o mas campos de la base de datos evitando que se repitan En este caso, no peuden haber 2 tipos de documentos con el mismo nombre. 
-            #Campo "nombre" debe ser unico en la tabla
+            UniqueConstraint(fields=['nombre'], name='unique_tipo_documento')   
         ]     
+        '''UniqueConstraint impone restricciones de unicidad en uno o mas campos 
+        de la base de datos evitando que se repitan. En este caso, no pueden haber 
+        2 tipos de documentos con el mismo nombre. Campo "nombre" debe ser unico en la tabla'''
 
 
     def save(self, *args, **kwargs):
