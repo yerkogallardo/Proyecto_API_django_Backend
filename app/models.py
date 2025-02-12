@@ -1,8 +1,4 @@
 from django.db import models
-
-# Create your models here.
-
-from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db.models import UniqueConstraint
 from app.api.validators import custom_validate_file
@@ -163,7 +159,7 @@ class TipoDocumentoPermitido(models.Model):
     organismos_permitidos = models.ManyToManyField(
         OrganismoSectorial,
         related_name='tipos_documentos_permitidos'
-    )     #permite asociar varios usuarios a un mismo documento 
+    )    
     
 
     class Meta:
