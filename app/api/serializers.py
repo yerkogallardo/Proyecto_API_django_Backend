@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from app.models import Documento, TipoDocumentoPermitido, OrganismoSectorial
+from app.models import Documento, Medidas, OrganismoSectorial
 
 #Aquí validaremos la información entrante para garantizar seguridad e integridad
 
-class TipoDocumentoPermitidoSerializer(serializers.ModelSerializer):
+class MedidasSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TipoDocumentoPermitido
+        model = Medidas
         fields = '__all__'
 
 

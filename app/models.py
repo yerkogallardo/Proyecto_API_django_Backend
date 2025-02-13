@@ -79,8 +79,8 @@ class Usuario(AbstractUser):
 
 def documento_upload_path(instance, filename):
     #Generamos una ruta personalizada basada en el usuario (ente fiscalizador) y el tipo de documento
-    return f"documentos/{instance.usuario.organismo_sectorial.codigo_ente}/{instance.tipo_documento.nombre}/{filename}"
-   
+    return f"documentos/{instance.usuario.organismo_sectorial.codigo_ente}/{instance.tipo_medida.nombre}/{filename}"
+
 
 
 class Documento(models.Model):     #clase que representa cada archivo que se sube al sistema
@@ -94,8 +94,8 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
         related_name='documentos'
         )
     
-    tipo_documento = models.ForeignKey(     
-        'TipoDocumentoPermitido',
+    tipo_medida = models.ForeignKey(     
+        'Medidas',
         on_delete=models.CASCADE,
         )
 
@@ -119,10 +119,10 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
     )
 
     def clean(self):     #metodo para validar datos de un formulario
-        # Validar que el usuario pertenezca a un organismo que puede subir este tipo de documento
-        if not self.tipo_documento.organismos_permitidos.filter(id=self.usuario.organismo_sectorial.id).exists():
+        # Validar que el usuario pertenezca a un organismo que puede subir este tipo de medida
+        if not self.tipo_medida.organismos_permitidos.filter(id=self.usuario.organismo_sectorial.id).exists():
             raise ValidationError({
-                'tipo_documento': "Este tipo de documento no está permitido para su organismo sectorial."
+                'tipo_medida': "Este tipo de documento no está permitido para su organismo sectorial."
             })
         
         # Validar que el usuario esté autorizado para subir reportes
@@ -136,14 +136,14 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.usuario.organismo_sectorial.tipo_ente} - {self.tipo_documento.nombre}"
+        return f"{self.usuario.organismo_sectorial.tipo_ente} - {self.tipo_medida.nombre}"
     
 
 
-class TipoDocumentoPermitido(models.Model):     
+class Medidas(models.Model):     
     """
-    Se define qué tipos de documentos pueden subir cada usuario. Pueden tener formatos compartidos o propios.
-    No confundir con "extensión" del documento. Ejemplo: "Catastro de incendios forestales" solo lo sube conaf
+    Se define a que Medidas debe dar cuenta cada usuario de org sectorial. Pueden tener formatos compartidos o propios.
+    Ejemplo: "Control emisiones complejo termoelectrico ventanas" solo lo sube Superintendencia electricidad y combustibles
     """
 
     nombre = models.CharField(max_length=100)    
@@ -155,7 +155,7 @@ class TipoDocumentoPermitido(models.Model):
         help_text="Indica si este documento es de entrega obligatoria"
     )
 
-    #cada tipo de documento puede asociarse a multiples usuarios
+    #cada medida puede ser reportada por multiples usuarios
     organismos_permitidos = models.ManyToManyField(
         OrganismoSectorial,
         related_name='tipos_documentos_permitidos'
@@ -164,7 +164,7 @@ class TipoDocumentoPermitido(models.Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=['nombre'], name='unique_tipo_documento')   
+            UniqueConstraint(fields=['nombre'], name='unique_tipo_medida')   
         ]     
         '''UniqueConstraint impone restricciones de unicidad en uno o mas campos 
         de la base de datos evitando que se repitan. En este caso, no pueden haber 

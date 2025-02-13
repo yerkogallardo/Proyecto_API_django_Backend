@@ -6,14 +6,14 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, IsAdminUser
-from app.api.serializers import DocumentoSerializer, TipoDocumentoPermitidoSerializer, OrganismoSectorialSerializer
-from app.models import Usuario, Documento, TipoDocumentoPermitido, OrganismoSectorial
+from app.api.serializers import DocumentoSerializer, MedidasSerializer, OrganismoSectorialSerializer
+from app.models import Usuario, Documento, Medidas, OrganismoSectorial
 # Create your views here.
 
 
-class TipoDocumentoPermitidoViewSet(viewsets.ModelViewSet):
-    serializer_class = TipoDocumentoPermitidoSerializer
-    queryset = TipoDocumentoPermitido.objects.all()
+class MedidasViewSet(viewsets.ModelViewSet):
+    serializer_class = MedidasSerializer
+    queryset = Medidas.objects.all()
     permission_classes = [IsAdminUser]
 
 
@@ -39,7 +39,7 @@ class DocumentoViewSet(viewsets.ModelViewSet):
         """
         Retorna los tipos de documentos permitidos para el tipo de ente del usuario actual
         """
-        return TipoDocumentoPermitido.objects.filter(
+        return Medidas.objects.filter(
             tipo_ente=self.request.user.tipo_ente
         )
     
