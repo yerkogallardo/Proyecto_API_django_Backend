@@ -71,27 +71,27 @@ class Usuario(AbstractUser):
 
     class Meta:
         permissions = [
-            ("can_upload_documents", "Puede subir documentos"),
-            ("can_view_all_documents", "Puede ver todos los documentos"),
+            ("can_upload_reports", "Puede subir reportes"),
+            ("can_view_all_reports", "Puede ver todos los reportes"),
         ]
 
     
 
-def documento_upload_path(instance, filename):
-    #Generamos una ruta personalizada basada en el usuario (ente fiscalizador) y el tipo de documento
-    return f"documentos/{instance.usuario.organismo_sectorial.codigo_ente}/{instance.tipo_medida.nombre}/{filename}"
+def reporte_upload_path(instance, filename):
+    #Generamos una ruta personalizada basada en el usuario (ente fiscalizador) y la medida
+    return f"reportes/{instance.usuario.organismo_sectorial.codigo_ente}/{instance.tipo_medida.nombre}/{filename}"
 
 
 
-class Documento(models.Model):     #clase que representa cada archivo que se sube al sistema
+class Reporte(models.Model):     #clase que representa cada archivo que se sube al sistema
     """
-    Modelo para manejar los documentos subidos por los usuarios asociados a un organismo sectorial.
-    Cada documento está asociado directamente con el usuario que lo subió.
+    Modelo para manejar los reportes subidos por los usuarios asociados a un organismo sectorial.
+    Cada reporte está asociado directamente con el usuario que lo subió.
     """
     usuario = models.ForeignKey(     #usuario que sube el archivo
         Usuario, 
         on_delete=models.CASCADE, 
-        related_name='documentos'
+        related_name='reportes'
         )
     
     tipo_medida = models.ForeignKey(     
@@ -100,7 +100,7 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
         )
 
     archivo = models.FileField(     
-        upload_to=documento_upload_path,
+        upload_to= reporte_upload_path,
         # validators=['custom_validate_file']     
         )
     '''custom_validate_file = Funcion validadora. Corchetes ya que validators 
@@ -122,13 +122,13 @@ class Documento(models.Model):     #clase que representa cada archivo que se sub
         # Validar que el usuario pertenezca a un organismo que puede subir este tipo de medida
         if not self.tipo_medida.organismos_permitidos.filter(id=self.usuario.organismo_sectorial.id).exists():
             raise ValidationError({
-                'tipo_medida': "Este tipo de documento no está permitido para su organismo sectorial."
+                'tipo_medida': "Esta medida no está permitido para su organismo sectorial."
             })
         
         # Validar que el usuario esté autorizado para subir reportes
         if not self.usuario.autorizado_para_reportes:
             raise ValidationError({
-                'usuario': "Este usuario no está autorizado para subir documentos."
+                'usuario': "Este usuario no está autorizado para generar reportes."
             })
 
     def save(self, *args, **kwargs):
@@ -152,13 +152,13 @@ class Medidas(models.Model):
 
     obligatorio = models.BooleanField(
         default=False,
-        help_text="Indica si este documento es de entrega obligatoria"
+        help_text="Indica si esta medida es de entrega obligatoria"
     )
 
     #cada medida puede ser reportada por multiples usuarios
     organismos_permitidos = models.ManyToManyField(
         OrganismoSectorial,
-        related_name='tipos_documentos_permitidos'
+        related_name='medidas_permitidas'
     )    
     
 
@@ -168,11 +168,11 @@ class Medidas(models.Model):
         ]     
         '''UniqueConstraint impone restricciones de unicidad en uno o mas campos 
         de la base de datos evitando que se repitan. En este caso, no pueden haber 
-        2 tipos de documentos con el mismo nombre. Campo "nombre" debe ser unico en la tabla'''
+        2 tipos de medidas con el mismo nombre. Campo "nombre" debe ser unico en la tabla'''
 
 
     def save(self, *args, **kwargs):
-        print(f"Guardando TipoDocumentoPermitido: {self.nombre}")  
+        print(f"Guardando Medida: {self.nombre}")  
         super().save(*args, **kwargs)
         print(f"Guardado exitosamente: {self.nombre}")
 

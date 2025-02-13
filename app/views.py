@@ -6,8 +6,8 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, IsAdminUser
-from app.api.serializers import DocumentoSerializer, MedidasSerializer, OrganismoSectorialSerializer
-from app.models import Usuario, Documento, Medidas, OrganismoSectorial
+from app.api.serializers import ReporteSerializer, MedidasSerializer, OrganismoSectorialSerializer
+from app.models import Usuario, Reporte, Medidas, OrganismoSectorial
 # Create your views here.
 
 
@@ -18,28 +18,28 @@ class MedidasViewSet(viewsets.ModelViewSet):
 
 
 
-class DocumentoViewSet(viewsets.ModelViewSet):
-    serializer_class = DocumentoSerializer
+class ReporteViewSet(viewsets.ModelViewSet):
+    serializer_class = ReporteSerializer
     permission_classes = [IsAuthenticated, DjangoModelPermissions]
 
-    queryset = Documento.objects.all()
+    queryset = Reporte.objects.all()
 
     def get_queryset(self):
         """
-        Filtramos los documentos para que cada usuario solo vea los suyos,
+        Filtramos los reportes para que cada usuario solo vea los suyos,
         excepto si tiene permisos especiales
         """
         user = self.request.user
 
-        if user.has_perm('app.can_view_all_documents'):
-            return Documento.objects.all()
-        return Documento.objects.filter(usuario=user)
+        if user.has_perm('app.can_view_all_reports'):
+            return Reporte.objects.all()
+        return Reporte.objects.filter(usuario=user)
     
     def get_tipos_documentos_permitidos(self):
         """
-        Retorna los tipos de documentos permitidos para el tipo de ente del usuario actual
+        Retorna las medidas para el tipo de ente del usuario actual
         """
         return Medidas.objects.filter(
-            tipo_ente=self.request.user.tipo_ente
+            tipo_ente=self.request.user.organismos_permitidos
         )
     

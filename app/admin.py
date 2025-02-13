@@ -3,14 +3,14 @@ from django.contrib import admin
 # Register your models here.
 
 from django.contrib.auth.admin import UserAdmin
-from app.models import Usuario, Documento, Medidas, OrganismoSectorial
+from app.models import Usuario, Reporte, Medidas, OrganismoSectorial
 
 
 class UsuarioAdmin(admin.ModelAdmin):
     list_display = ('username', 'organismo_sectorial', 'autorizado_para_reportes')
 
 
-class DocumentoAdmin(admin.ModelAdmin):
+class ReporteAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'tipo_medida', 'archivo', 'fecha_subida', 'estado')
 
 
@@ -25,6 +25,6 @@ class MedidaAdmin(admin.ModelAdmin):     #OJO AQUI
 
 
 admin.site.register(Usuario, UsuarioAdmin)
-admin.site.register(Documento, DocumentoAdmin)
+admin.site.register(Reporte, ReporteAdmin)
 admin.site.register(Medidas, MedidaAdmin)
 admin.site.register(OrganismoSectorial)
