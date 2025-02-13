@@ -139,5 +139,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication',     #PARA SOLICITUDES CON TOKENS
                                        'rest_framework.authentication.SessionAuthentication',],    #PARA EL NAVEGADOR
-    # 'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],     #SOLO USUARIOS AUTENTICADOS. 
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],     #SOLO USUARIOS AUTENTICADOS. 
     }
