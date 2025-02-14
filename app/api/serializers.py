@@ -1,12 +1,28 @@
 from rest_framework import serializers
-from app.models import Reporte, Medidas, OrganismoSectorial
+from app.models import Reporte, Medidas, OrganismoSectorial, Usuario
 
 #Aquí validaremos la información entrante para garantizar seguridad e integridad
+
+
+class UsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = '__all__'
+
+
+
+class OrganismoSectorialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganismoSectorial
+        fields = '__all__'
+
+
 
 class MedidasSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medidas
         fields = '__all__'
+
 
 
 class ReporteSerializer(serializers.ModelSerializer):
@@ -29,8 +45,6 @@ class ReporteSerializer(serializers.ModelSerializer):
             )
         return data
 
-
-
     def create(self, validated_data):     
         """crea el objeto en la base de datos con los datos ya validados
         asigna automaticamente el usuario actual"""
@@ -40,7 +54,3 @@ class ReporteSerializer(serializers.ModelSerializer):
 
 
     
-class OrganismoSectorialSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrganismoSectorial
-        fields = '__all__'

@@ -17,16 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from app.views import ReporteViewSet, MedidasViewSet
+from app.views import ReporteViewSet, MedidasViewSet, OrganismoSectorialViewSet, UsuarioViewSet
 
 router = routers.DefaultRouter()
 
-router.register(r'reportes', ReporteViewSet, basename='reporte')
+
+router.register(r'usuarios', UsuarioViewSet)
+router.register(r'organismossectoriales', OrganismoSectorialViewSet)
 router.register(r'medidas', MedidasViewSet)
+router.register(r'reportes', ReporteViewSet, basename='reporte')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),     #permite loguear y desloguear de DRF en la version web
 ]
-

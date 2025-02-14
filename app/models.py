@@ -181,4 +181,3 @@ class Medidas(models.Model):
         organismos = ", ".join([org.codigo_ente for org in self.organismos_permitidos.all()])
         return f"{self.nombre} - Permitido para: {organismos}"
     
-

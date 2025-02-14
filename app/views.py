@@ -6,9 +6,22 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, IsAdminUser
-from app.api.serializers import ReporteSerializer, MedidasSerializer, OrganismoSectorialSerializer
+from app.api.serializers import ReporteSerializer, MedidasSerializer, OrganismoSectorialSerializer, UsuarioSerializer
 from app.models import Usuario, Reporte, Medidas, OrganismoSectorial
 # Create your views here.
+
+class UsuarioViewSet(viewsets.ModelViewSet):
+    serializer_class = UsuarioSerializer
+    queryset = Usuario.objects.all()
+    permission_classes = [IsAdminUser]
+
+
+
+class OrganismoSectorialViewSet(viewsets.ModelViewSet):
+    serializer_class = OrganismoSectorialSerializer
+    queryset = OrganismoSectorial.objects.all()
+    permission_classes = [IsAuthenticated]
+
 
 
 class MedidasViewSet(viewsets.ModelViewSet):
