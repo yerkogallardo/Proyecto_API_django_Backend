@@ -17,8 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from app.views import ReporteViewSet, MedidasViewSet, OrganismoSectorialViewSet, UsuarioViewSet
-from rest_framework.authtoken.views import obtain_auth_token
+from app.views import ReporteViewSet, MedidasViewSet, OrganismoSectorialViewSet, UsuarioViewSet, GrupoViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 #from DRF-spectacular (documentation)
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -30,13 +30,16 @@ router.register(r'usuarios', UsuarioViewSet)
 router.register(r'organismossectoriales', OrganismoSectorialViewSet)
 router.register(r'medidas', MedidasViewSet)
 router.register(r'reportes', ReporteViewSet, basename='reporte')
+router.register(r'grupos', GrupoViewSet, basename='grupos')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),     #permite loguear y desloguear de DRF en la version web
-    path('api/token/', obtain_auth_token, name='api_token_auth'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     
     #SCHEMA DRF-Spectacular
     # Generador de Schema-file
