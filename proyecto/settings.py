@@ -83,17 +83,35 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'OPTIONS': {
+#             'options': '-c search_path=app'     #OPCION PARA CAMBIAR EL ESQUEMA A USAR
+#             },
+#         'NAME': env('DB_NAME'),
+#         'USER': env('DB_USER'),
+#         'PASSWORD': env('DB_PASSWORD'),
+#         'HOST': env('DB_HOST'),
+#         'PORT': env('DB_PORT'),
+#     }
+# }
+
+import sys
+
+IS_TESTING = 'pytest' in sys.argv[0]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'options': '-c search_path=app'     #OPCION PARA CAMBIAR EL ESQUEMA A USAR
-            },
         'NAME': env('DB_NAME'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
+        'OPTIONS': {
+            'options': '-c search_path={}'.format('public' if IS_TESTING else 'app')
+        }
     }
 }
 

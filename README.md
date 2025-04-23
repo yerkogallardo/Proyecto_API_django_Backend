@@ -168,8 +168,8 @@ Crea una base de datos llamada ***proyecto*** en PostgreSQL. Luego, dentro de la
 
 Ejecuta los siguientes comandos para crear las tablas en la base de datos:
 ```env
-python manage.py makemigrations*
-python manage.py migrate*
+python manage.py makemigrations
+python manage.py migrate
 ```
 **7. Crear superusuario**
 
@@ -180,4 +180,4 @@ python manage.py createsuperuser*
 **8. Iniciar el servidor**
 
 Finalmente, ejecuta el servidor local con:
--*python manage.py runserver*
+**python manage.py runserver**
